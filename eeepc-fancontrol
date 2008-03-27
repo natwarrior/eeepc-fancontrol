@@ -1,0 +1,113 @@
+#!/usr/bin/perl -l
+################################################
+# eeePC Fan Control Script by Raimo Radczewski
+#  raimoradczewski at googlemail dot com
+#
+# Needs eee.ko Module
+# Version 0.12
+
+## Options
+# Check Temperature every X seconds
+my $interval	=	1;
+
+# Maximum/Minimum Fan Speed
+# ATTENTION: $minSpeed MUST be higher than 14
+my $maxSpeed	=	100;
+my $minSpeed	=	14;
+
+# Temperatures for when to set $maxSpeed / $minSpeed
+my $highTemp	=	58;
+my $normalTemp 	=	50;
+
+
+## DO NOT CHANGE ANYTHING BELOW THIS ##
+my $jump	=	($maxSpeed-$minSpeed)/($highTemp-$normalTemp);
+my $startSpeed	=	40;
+my $stopSpeed	=	14;
+$minSpeed = $stopSpeed if($minSpeed < $stopSpeed);
+
+use Sys::Syslog;
+
+openlog("eeepc-fancontrol", "ndelay", "local0");
+
+# Print some Information at syslog
+syslog(LOG_INFO, "FanControl started with:");
+syslog(LOG_INFO, " MinSpeed: $minSpeed MaxSpeed: $maxSpeed");
+syslog(LOG_INFO, " NormalTemp: $normalTemp MaxSpeed: $highTemp");
+syslog(LOG_INFO, " Calculated Speed/C: $jump");
+
+# Checking for Module 'eee' to be present
+checkModule();
+
+# Entering Main Loop
+while (1) {
+	checkFanOverride();
+	checkFanRPM();
+	$temperature = getTemperature();
+	if ($temperature < $normalTemp) { setFanSpeed($minSpeed); }
+	elsif($temperature > $highTemp) { setFanSpeed($maxSpeed); }
+	else { setFanSpeed($minSpeed+$jump*($temperature-$normalTemp));
+	}
+	sleep($interval);
+}
+closelog();
+
+sub checkFanRPM() {
+	if(getFanRPM() < 10) {
+		syslog(LOG_INFO, "Fan stopped spinning. Speed raised to: ".$startSpeed);
+		setFanSpeed($startSpeed);
+		sleep(1);
+	}
+}
+
+sub setFanSpeed {
+	$speed = int(shift);
+	return if($speed eq getSpeed());
+	syslog(LOG_INFO, "Speed set to: ".$speed);
+
+	open(TEMP, ">/proc/eee/fan_speed");
+	print TEMP $speed;
+	close(TEMP);
+}
+
+
+sub getSpeed {
+	open(TEMP, "</proc/eee/fan_speed");
+	$currentSpeed = <TEMP>; chomp($currentSpeed);
+	close(TEMP);
+	return $currentSpeed;
+}
+
+sub getFanRPM {
+	open(TEMP, "</proc/eee/fan_rpm");
+	$currentRPM = <TEMP>; chomp($currentRPM);
+	close(TEMP);
+	return $currentRPM;
+}
+
+sub getTemperature {
+	open(TEMP, "</proc/eee/temperature");
+	$currentTemperature = <TEMP>; chomp($currentTemperature);
+	close(TEMP);
+	return $currentTemperature;
+}
+
+sub checkFanOverride {
+	open(TEMP, "</proc/eee/fan_manual");
+	$currentFanState = <TEMP>; chomp($currentFanState);
+	FanOverride() if($currentFanState eq 0);
+}
+
+sub FanOverride {
+	open(TEMP, ">/proc/eee/fan_manual");
+	print TEMP 1;
+	close(TEMP);
+	syslog(LOG_INFO, "Fan Control Override triggered");
+}
+
+sub checkModule {
+	if (`lsmod` !~ /eee/) {
+		system("modprobe eee");
+		syslog(LOG_INFO, "Inserted EEE Module");
+	}
+}
