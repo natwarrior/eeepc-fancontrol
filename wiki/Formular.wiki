@@ -15,7 +15,13 @@ Additional information:
 The fan speed value is 0 to 100. Those are percentages (wow!). The fan itself is PWM controlled.
 
 The daemon adjusts fan speed by translating the temperature + the variables linear to a fan speed. The speedPercentage per Celsius+$normalTemp is calculated this way:
-
+{{{
 $speedPercentage = $minSpeed+(($maxSpeed-$minSpeed)/($highTemp-$normalTemp)*($currentTemperature-$normalTemp))
-
+}}}
 This formular is quite simple but effective. This way fan really spins only if needed.
+
+Applicable settings for the vars are (tested, usualy not harming)
+$minSpeed = 0
+$maxSpeed = 0
+$normalTemp = 52
+$highTemp = 60
