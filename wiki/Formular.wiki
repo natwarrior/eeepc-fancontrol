@@ -21,7 +21,9 @@ $speedPercentage = $minSpeed+(($maxSpeed-$minSpeed)/($highTemp-$normalTemp)*($cu
 This formular is quite simple but effective. This way fan really spins only if needed.
 
 Applicable settings for the vars are (tested, usualy not harming)
+{{{
 $minSpeed = 0
 $maxSpeed = 0
 $normalTemp = 52
 $highTemp = 60
+}}}
