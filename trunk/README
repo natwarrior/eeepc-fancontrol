@@ -1,0 +1,7 @@
+I am not responsible for any damage you do to your hardware or software by using eeepc-fancontrol
+I use it for my eee 701G and it works fine.
+Always monitor your temperature with gkrellm or manual at /proc/eee/temperature
+
+Attention:
+Always remember the fan motor stops spinning under 14%. 
+Version 0.2 checks for this and restores the fan if necessary.

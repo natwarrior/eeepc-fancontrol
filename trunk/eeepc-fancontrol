@@ -66,8 +66,8 @@ sub checkFanRPM() {
 
 sub setFanSpeed {
 	$speed = int(shift);
-	return if($speed eq getFanSpeed());
 	$speed = 14 if($speed > 0 and $speed < $stopSpeed);
+	return if($speed eq getFanSpeed());
 	syslog(LOG_INFO, "Speed set to: ".$speed);
 
 	open(TEMP, ">/proc/eee/fan_speed");

@@ -1,0 +1,35 @@
+#! /bin/sh
+
+DESC="Reemos Fan Control"
+NAME=eeepc-fancontrol
+SCRIPTNAME=/etc/init.d/$NAME
+
+do_start()
+{
+    /usr/bin/eeepc-fancontrol &
+}
+
+do_stop()
+{
+    killall -q  eeepc-fancontrol
+}
+
+case "$1" in
+  start)
+      echo "Starting $DESC $NAME"
+      do_start
+      ;;
+   stop)
+      echo "Stopping $DESC $NAME"
+      do_stop
+      ;;
+  restart)
+      echo "Stopping $DESC $NAME"
+      do_stop
+      sleep 1
+      echo "Starting $DESC $NAME"
+      do_start
+      ;;
+    *)
+      echo "Usage: $SCRIPTNAME {start|stop|restart}"
+esac
