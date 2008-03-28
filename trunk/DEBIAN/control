@@ -1,0 +1,8 @@
+Package: eeepc-fancontrol
+Version: 0.2
+Section: hardware
+Architecture: all
+Pre-Depends: perl
+Maintainer: Raimo Radczewski [raimoradczewski@gmail.com]
+Provides: eeepc-fancontrol
+Description: Automatic Software Fan Control for EeePC
