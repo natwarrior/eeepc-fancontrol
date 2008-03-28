@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/etc/init.d/eeepc-fancontrol stop
+exit 0
