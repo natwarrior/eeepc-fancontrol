@@ -1,10 +1,12 @@
 #!/usr/bin/perl -l
 ################################################
-# eeePC Fan Control Script by Raimo Radczewski
-#  raimoradczewski at googlemail dot com
+# eeePC Fan Control Daemon 0.2
+#  Author       : raimoradczewski at googlemail dot com
+#  Author Blog  : http://www.ireemo.de/ (english)
+#  Project Home : http://code.google.com/p/eeepc-fancontrol/
 #
 # Needs eee.ko Module
-# Version 0.12
+# Version 0.2
 
 ## Options
 # Check Temperature every X seconds
@@ -13,7 +15,7 @@ my $interval	=	1;
 # Maximum/Minimum Fan Speed
 # ATTENTION: $minSpeed MUST be higher than 14
 my $maxSpeed	=	100;
-my $minSpeed	=	14;
+my $minSpeed	=	0;
 
 # Temperatures for when to set $maxSpeed / $minSpeed
 my $highTemp	=	58;
@@ -24,7 +26,9 @@ my $normalTemp 	=	50;
 my $jump	=	($maxSpeed-$minSpeed)/($highTemp-$normalTemp);
 my $startSpeed	=	40;
 my $stopSpeed	=	14;
-$minSpeed = $stopSpeed if($minSpeed < $stopSpeed);
+
+$SIG{KILL} = 'terminateFancontrol';
+$SIG{TERM} = 'terminateFancontrol';
 
 use Sys::Syslog;
 
@@ -53,7 +57,7 @@ while (1) {
 closelog();
 
 sub checkFanRPM() {
-	if(getFanRPM() < 10) {
+	if(getFanRPM() < 10 && getFanSpeed() ne 0) {
 		syslog(LOG_INFO, "Fan stopped spinning. Speed raised to: ".$startSpeed);
 		setFanSpeed($startSpeed);
 		sleep(1);
@@ -62,7 +66,8 @@ sub checkFanRPM() {
 
 sub setFanSpeed {
 	$speed = int(shift);
-	return if($speed eq getSpeed());
+	return if($speed eq getFanSpeed());
+	$speed = 14 if($speed > 0 and $speed < $stopSpeed);
 	syslog(LOG_INFO, "Speed set to: ".$speed);
 
 	open(TEMP, ">/proc/eee/fan_speed");
@@ -70,8 +75,14 @@ sub setFanSpeed {
 	close(TEMP);
 }
 
+sub terminateFancontrol {
+	FanOverride(0);
+	syslog(LOG_INFO, "Hardware Fan Control restored");
+	syslog(LOG_INFO, "Shutting down...");
+	die;
+}
 
-sub getSpeed {
+sub getFanSpeed {
 	open(TEMP, "</proc/eee/fan_speed");
 	$currentSpeed = <TEMP>; chomp($currentSpeed);
 	close(TEMP);
@@ -95,12 +106,13 @@ sub getTemperature {
 sub checkFanOverride {
 	open(TEMP, "</proc/eee/fan_manual");
 	$currentFanState = <TEMP>; chomp($currentFanState);
-	FanOverride() if($currentFanState eq 0);
+	FanOverride(1) if($currentFanState eq 0);
 }
 
 sub FanOverride {
+	$state = shift;
 	open(TEMP, ">/proc/eee/fan_manual");
-	print TEMP 1;
+	print TEMP $state;
 	close(TEMP);
 	syslog(LOG_INFO, "Fan Control Override triggered");
 }
