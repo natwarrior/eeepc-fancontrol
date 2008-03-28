@@ -1,0 +1,14 @@
+eeePC Fan Control - Perl Daemon
+
+-----Requirements-----
+- Perl
+- eee.ko Module (http://code.google.com/p/eeepc-linux/)
+
+-----Installation-----
+cp eeepc-fancontrol /usr/bin/:
+chmod a+x /usr/bin/eeepc-fancontrol
+
+mv eeepc-fancontrol-init /etc/init.d/eeepc-fancontrol
+update-rc.d eeepc-fancontrol defaults
+
+/etc/init.d/eeepc-fancontrol start
