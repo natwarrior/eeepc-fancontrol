@@ -18,7 +18,7 @@ my $maxSpeed	=	100;
 my $minSpeed	=	0;
 
 # Temperatures for when to set $maxSpeed / $minSpeed
-my $highTemp	=	58;
+my $highTemp	=	70;
 my $normalTemp 	=	50;
 
 
@@ -57,7 +57,7 @@ while (1) {
 closelog();
 
 sub checkFanRPM() {
-	if(getFanRPM() < 10 && getFanSpeed() ne 0) {
+	if(getFanRPM() eq 0 && getFanSpeed() ne 0) {
 		syslog(LOG_INFO, "Fan stopped spinning. Speed raised to: ".$startSpeed);
 		setFanSpeed($startSpeed);
 		sleep(1);
@@ -66,7 +66,7 @@ sub checkFanRPM() {
 
 sub setFanSpeed {
 	$speed = int(shift);
-	$speed = 14 if($speed > 0 and $speed < $stopSpeed);
+	$speed = $stopSpeed if($speed > 0 and $speed < $stopSpeed);
 	return if($speed eq getFanSpeed());
 	syslog(LOG_INFO, "Speed set to: ".$speed);
 
@@ -79,7 +79,7 @@ sub terminateFancontrol {
 	FanOverride(0);
 	syslog(LOG_INFO, "Hardware Fan Control restored");
 	syslog(LOG_INFO, "Shutting down...");
-	die;
+	exit(0);
 }
 
 sub getFanSpeed {

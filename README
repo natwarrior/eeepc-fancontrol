@@ -14,7 +14,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 --------------------------------------------------------------------------------
+
 I am not responsible for any damage you do to your hardware or software by using eeepc-fancontrol
 I use it for my eee 701G and it works fine.
 Always monitor your temperature with gkrellm or manual at /proc/eee/temperature
