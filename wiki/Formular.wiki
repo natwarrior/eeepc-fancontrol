@@ -4,10 +4,10 @@
 = Introduction =
 
 The formular used by eeepc-fancontrol is very simple. Used variables are
-$minSpeed (> 0 and < 100 and < $maxSpeed) for the minimum speed the fan should run,
-$maxSpeed (> 0 and < 100 and > $minSpeed) for the maximum speed,
-$normalTemp (> 0 and < $highTemp) for the temperature the fan should start spinning at $minSpeed,
-$highTemp (> 0 and > $normalTemp) for the temperature the fan should spin at $maxSpeed
+ * $minSpeed (> 0 and < 100 and < $maxSpeed) for the minimum speed the fan should run,
+ * $maxSpeed (> 0 and < 100 and > $minSpeed) for the maximum speed,
+ * $normalTemp (> 0 and < $highTemp) for the temperature the fan should start spinning at $minSpeed,
+ * $highTemp (> 0 and > $normalTemp) for the temperature the fan should spin at $maxSpeed
 
 = Details =
 
