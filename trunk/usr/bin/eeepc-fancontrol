@@ -13,7 +13,6 @@
 my $interval	=	1;
 
 # Maximum/Minimum Fan Speed
-# ATTENTION: $minSpeed MUST be higher than 14
 my $maxSpeed	=	100;
 my $minSpeed	=	0;
 
@@ -29,6 +28,7 @@ my $stopSpeed	=	14;
 
 $SIG{KILL} = 'terminateFancontrol';
 $SIG{TERM} = 'terminateFancontrol';
+$SIG{INT}  = 'terminateFancontrol';
 
 use Sys::Syslog;
 
