@@ -8,6 +8,9 @@
 # Needs eee.ko Module
 # Version 0.21
 
+use strict;
+use Sys::Syslog qw (:standard :macros);
+
 ## Options
 # Check Temperature every X seconds
 my $interval	=	1;
@@ -25,20 +28,19 @@ my $normalTemp 	=	50;
 my $jump	=	($maxSpeed-$minSpeed)/($highTemp-$normalTemp);
 my $startSpeed	=	40;
 my $stopSpeed	=	14;
+our $temperature;
 
 $SIG{KILL} = 'terminateFancontrol';
 $SIG{TERM} = 'terminateFancontrol';
 $SIG{INT}  = 'terminateFancontrol';
 
-use Sys::Syslog;
-
 openlog("eeepc-fancontrol", "ndelay", "local0");
 
 # Print some Information at syslog
 syslog(LOG_INFO, "FanControl started with:");
-syslog(LOG_INFO, " MinSpeed: $minSpeed MaxSpeed: $maxSpeed");
-syslog(LOG_INFO, " NormalTemp: $normalTemp MaxSpeed: $highTemp");
-syslog(LOG_INFO, " Calculated Speed/C: $jump");
+syslog(LOG_INFO, " MinSpeed: ".$minSpeed."% MaxSpeed: ".$maxSpeed."%");
+syslog(LOG_INFO, " NormalTemp: ".$normalTemp."°C MaxSpeed: ".$highTemp."°C");
+syslog(LOG_INFO, " Calculated Speed/C: ".$jump);
 
 # Checking for Module 'eee' to be present
 checkModule();
@@ -58,17 +60,17 @@ closelog();
 
 sub checkFanRPM() {
 	if(getFanRPM() eq 0 && getFanSpeed() ne 0) {
-		syslog(LOG_INFO, "Fan stopped spinning. Speed raised to: ".$startSpeed);
+		syslog(LOG_INFO, "Fan stopped spinning. Speed raised to: ".$startSpeed."%");
 		setFanSpeed($startSpeed);
 		sleep(1);
 	}
 }
 
 sub setFanSpeed {
-	$speed = int(shift);
+	my $speed = int(shift);
 	$speed = $stopSpeed if($speed > 0 and $speed < $stopSpeed);
 	return if($speed eq getFanSpeed());
-	syslog(LOG_INFO, "Speed set to: ".$speed);
+	syslog(LOG_INFO, "Speed set to: ".$speed."% (Temp: ".$temperature."°C)");
 
 	open(TEMP, ">/proc/eee/fan_speed");
 	print TEMP $speed;
@@ -84,33 +86,33 @@ sub terminateFancontrol {
 
 sub getFanSpeed {
 	open(TEMP, "</proc/eee/fan_speed");
-	$currentSpeed = <TEMP>; chomp($currentSpeed);
+	my $currentSpeed = <TEMP>; chomp($currentSpeed);
 	close(TEMP);
 	return $currentSpeed;
 }
 
 sub getFanRPM {
 	open(TEMP, "</proc/eee/fan_rpm");
-	$currentRPM = <TEMP>; chomp($currentRPM);
+	my $currentRPM = <TEMP>; chomp($currentRPM);
 	close(TEMP);
 	return $currentRPM;
 }
 
 sub getTemperature {
 	open(TEMP, "</proc/eee/temperature");
-	$currentTemperature = <TEMP>; chomp($currentTemperature);
+	my $currentTemperature = <TEMP>; chomp($currentTemperature);
 	close(TEMP);
 	return $currentTemperature;
 }
 
 sub checkFanOverride {
 	open(TEMP, "</proc/eee/fan_manual");
-	$currentFanState = <TEMP>; chomp($currentFanState);
+	my $currentFanState = <TEMP>; chomp($currentFanState);
 	FanOverride(1) if($currentFanState eq 0);
 }
 
 sub FanOverride {
-	$state = shift;
+	my $state = shift;
 	open(TEMP, ">/proc/eee/fan_manual");
 	print TEMP $state;
 	close(TEMP);
