@@ -1,5 +1,5 @@
 Package: eeepc-fancontrol
-Version: 0.2
+Version: 0.21
 Section: hardware
 Architecture: all
 Pre-Depends: perl

@@ -1,12 +1,12 @@
 #!/usr/bin/perl -l
 ################################################
-# eeePC Fan Control Daemon 0.2
+# eeePC Fan Control Daemon 0.21
 #  Author       : raimoradczewski at googlemail dot com
 #  Author Blog  : http://www.ireemo.de/ (english)
 #  Project Home : http://code.google.com/p/eeepc-fancontrol/
 #
 # Needs eee.ko Module
-# Version 0.2
+# Version 0.21
 
 ## Options
 # Check Temperature every X seconds
@@ -17,7 +17,7 @@ my $maxSpeed	=	100;
 my $minSpeed	=	0;
 
 # Temperatures for when to set $maxSpeed / $minSpeed
-my $highTemp	=	70;
+my $highTemp	=	60;
 my $normalTemp 	=	50;
 
 
